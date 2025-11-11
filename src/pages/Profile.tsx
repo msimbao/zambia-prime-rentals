@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Crown, Upload, Calendar } from "lucide-react";
+import MyPropertiesTab from "@/components/MyPropertiesTab";
 
 const Profile = () => {
   const { currentUser, userData, isPremium, refreshPremiumStatus } = useAuth();
@@ -91,111 +93,124 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
 
-        <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Manage your profile details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={previewUrl} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                    {userData?.displayName?.charAt(0) || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label htmlFor="photo-upload">
-                    <Button variant="outline" asChild>
-                      <span className="cursor-pointer">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Change Photo
-                      </span>
-                    </Button>
-                  </label>
-                  {photoFile && (
-                    <Button onClick={handleUpdatePhoto} disabled={isLoading} className="ml-2">
-                      Save Photo
-                    </Button>
-                  )}
-                </div>
-              </div>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="properties">My Properties</TabsTrigger>
+          </TabsList>
 
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <Input value={userData?.displayName || ""} disabled />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input value={userData?.email || ""} disabled />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Crown className="h-6 w-6 mr-2 text-primary" />
-                Premium Membership
-              </CardTitle>
-              <CardDescription>
-                Premium members can add and manage property listings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {isPremium ? (
-                <div className="space-y-4">
-                  <Badge className="text-lg py-2 px-4">
-                    <Crown className="h-4 w-4 mr-2" />
-                    Active Premium Member
-                  </Badge>
-                  <div className="flex items-center text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>{getDaysRemaining()} days remaining</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Activate premium to start listing properties
-                  </p>
+          <TabsContent value="profile" className="mt-6">
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>Manage your profile details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={previewUrl} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                        {userData?.displayName?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex-1">
-                      <Label htmlFor="premium-days">Duration (days)</Label>
-                      <Input
-                        id="premium-days"
-                        type="number"
-                        min="1"
-                        value={premiumDays}
-                        onChange={(e) => setPremiumDays(parseInt(e.target.value))}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                        id="photo-upload"
                       />
+                      <label htmlFor="photo-upload">
+                        <Button variant="outline" asChild>
+                          <span className="cursor-pointer">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Change Photo
+                          </span>
+                        </Button>
+                      </label>
+                      {photoFile && (
+                        <Button onClick={handleUpdatePhoto} disabled={isLoading} className="ml-2">
+                          Save Photo
+                        </Button>
+                      )}
                     </div>
-                    <Button
-                      onClick={handleActivatePremium}
-                      disabled={isLoading}
-                      size="lg"
-                      className="mt-6"
-                    >
-                      Activate Premium
-                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Note: In production, this would integrate with a payment system
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+
+                  <div className="space-y-2">
+                    <Label>Name</Label>
+                    <Input value={userData?.displayName || ""} disabled />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input value={userData?.email || ""} disabled />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Crown className="h-6 w-6 mr-2 text-primary" />
+                    Premium Membership
+                  </CardTitle>
+                  <CardDescription>
+                    Premium members can add and manage property listings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {isPremium ? (
+                    <div className="space-y-4">
+                      <Badge className="text-lg py-2 px-4">
+                        <Crown className="h-4 w-4 mr-2" />
+                        Active Premium Member
+                      </Badge>
+                      <div className="flex items-center text-muted-foreground">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <span>{getDaysRemaining()} days remaining</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground">
+                        Activate premium to start listing properties
+                      </p>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-1">
+                          <Label htmlFor="premium-days">Duration (days)</Label>
+                          <Input
+                            id="premium-days"
+                            type="number"
+                            min="1"
+                            value={premiumDays}
+                            onChange={(e) => setPremiumDays(parseInt(e.target.value))}
+                          />
+                        </div>
+                        <Button
+                          onClick={handleActivatePremium}
+                          disabled={isLoading}
+                          size="lg"
+                          className="mt-6"
+                        >
+                          Activate Premium
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Note: In production, this would integrate with a payment system
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="properties" className="mt-6">
+            <MyPropertiesTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
