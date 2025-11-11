@@ -32,7 +32,7 @@ const AddProperty = () => {
     ownerPhone: "",
   });
 
-  if (!isPremium) {
+  if (false) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
