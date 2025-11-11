@@ -35,42 +35,7 @@ const AddProperty = () => {
     ownerPhone: "",
   });
 
-<<<<<<< HEAD
   if (false) {
-=======
-  useEffect(() => {
-    if (editId) {
-      loadProperty(editId);
-    }
-  }, [editId]);
-
-  const loadProperty = async (propertyId: string) => {
-    try {
-      const doc = await firestore().collection("properties").doc(propertyId).get();
-      if (doc.exists) {
-        const data = doc.data();
-        setFormData({
-          name: data.name,
-          price: data.price.toString(),
-          status: data.status,
-          type: data.type,
-          location: data.location,
-          size: data.size.toString(),
-          sizeUnit: data.sizeUnit,
-          description: data.description,
-          ownerPhone: data.ownerPhone || "",
-        });
-        setExistingImages(data.images || []);
-        setPreviewUrls(data.images || []);
-      }
-    } catch (error) {
-      console.error("Error loading property:", error);
-      toast.error("Failed to load property");
-    }
-  };
-
-  if (!isPremium) {
->>>>>>> 2a12bb51c29cfa5679cb5ff9c6007f81822c222d
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
