@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { firestore } from "@/lib/firebase";
 import { uploadMultipleToCloudinary } from "@/lib/cloudinary";
@@ -16,9 +16,12 @@ import { Upload, X } from "lucide-react";
 const AddProperty = () => {
   const { currentUser, userData, isPremium } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -31,6 +34,37 @@ const AddProperty = () => {
     description: "",
     ownerPhone: "",
   });
+
+  useEffect(() => {
+    if (editId) {
+      loadProperty(editId);
+    }
+  }, [editId]);
+
+  const loadProperty = async (propertyId: string) => {
+    try {
+      const doc = await firestore().collection("properties").doc(propertyId).get();
+      if (doc.exists) {
+        const data = doc.data();
+        setFormData({
+          name: data.name,
+          price: data.price.toString(),
+          status: data.status,
+          type: data.type,
+          location: data.location,
+          size: data.size.toString(),
+          sizeUnit: data.sizeUnit,
+          description: data.description,
+          ownerPhone: data.ownerPhone || "",
+        });
+        setExistingImages(data.images || []);
+        setPreviewUrls(data.images || []);
+      }
+    } catch (error) {
+      console.error("Error loading property:", error);
+      toast.error("Failed to load property");
+    }
+  };
 
   if (!isPremium) {
     return (
@@ -67,10 +101,17 @@ const AddProperty = () => {
     setPreviewUrls(newPreviewUrls);
   };
 
+  const removeExistingImage = (index: number) => {
+    const newExistingImages = existingImages.filter((_, i) => i !== index);
+    const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
+    setExistingImages(newExistingImages);
+    setPreviewUrls(newPreviewUrls);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!images.length) {
+    if (!images.length && !existingImages.length) {
       toast.error("Please add at least one image");
       return;
     }
@@ -78,32 +119,43 @@ const AddProperty = () => {
     setIsLoading(true);
 
     try {
-      // Upload images to Cloudinary
-      const imageUrls = await uploadMultipleToCloudinary(images);
+      // Upload new images to Cloudinary
+      const newImageUrls = images.length > 0 ? await uploadMultipleToCloudinary(images) : [];
+      const allImageUrls = [...existingImages, ...newImageUrls];
 
-      // Create property document
-      await firestore().collection("properties").add({
+      const propertyData = {
         name: formData.name,
         price: parseFloat(formData.price),
-        images: imageUrls,
+        images: allImageUrls,
         status: formData.status,
         type: formData.type,
         location: formData.location,
         size: parseFloat(formData.size),
         sizeUnit: formData.sizeUnit,
         description: formData.description,
-        ownerId: currentUser.uid,
-        ownerName: userData?.displayName || "",
         ownerPhone: formData.ownerPhone,
-        createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      };
 
-      toast.success("Property added successfully!");
-      navigate("/");
+      if (editId) {
+        // Update existing property
+        await firestore().collection("properties").doc(editId).update(propertyData);
+        toast.success("Property updated successfully!");
+      } else {
+        // Create new property
+        await firestore().collection("properties").add({
+          ...propertyData,
+          ownerId: currentUser.uid,
+          ownerName: userData?.displayName || "",
+          createdAt: new Date(),
+        });
+        toast.success("Property added successfully!");
+      }
+
+      navigate("/profile");
     } catch (error) {
-      console.error("Error adding property:", error);
-      toast.error("Failed to add property");
+      console.error("Error saving property:", error);
+      toast.error(editId ? "Failed to update property" : "Failed to add property");
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +167,9 @@ const AddProperty = () => {
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Add New Property</CardTitle>
+            <CardTitle className="text-3xl">
+              {editId ? "Edit Property" : "Add New Property"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -255,7 +309,7 @@ const AddProperty = () => {
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <Upload className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
-                      Click to upload images
+                      Click to upload {existingImages.length > 0 ? "more images" : "images"}
                     </p>
                   </label>
                 </div>
@@ -271,7 +325,13 @@ const AddProperty = () => {
                         />
                         <button
                           type="button"
-                          onClick={() => removeImage(index)}
+                          onClick={() => {
+                            if (index < existingImages.length) {
+                              removeExistingImage(index);
+                            } else {
+                              removeImage(index - existingImages.length);
+                            }
+                          }}
                           className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-4 w-4" />
@@ -283,7 +343,9 @@ const AddProperty = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Adding Property..." : "Add Property"}
+                {isLoading 
+                  ? (editId ? "Updating Property..." : "Adding Property...") 
+                  : (editId ? "Update Property" : "Add Property")}
               </Button>
             </form>
           </CardContent>
