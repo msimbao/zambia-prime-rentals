@@ -1,12 +1,23 @@
 // Firebase configuration and initialization
 // Replace these with your actual Firebase config
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+
+  apiKey: "AIzaSyDM6sd8IIhnTGOVe2b9ZaI208q15UnBfCg",
+
+  authDomain: "lmrentals-e8088.firebaseapp.com",
+
+  databaseURL: "https://lmrentals-e8088-default-rtdb.firebaseio.com",
+
+  projectId: "lmrentals-e8088",
+
+  storageBucket: "lmrentals-e8088.firebasestorage.app",
+
+  messagingSenderId: "777006104069",
+
+  appId: "1:777006104069:web:8030c514167655038f266c",
+
+  measurementId: "G-907MEJ2LW8"
+
 };
 
 // Initialize Firebase

@@ -1,7 +1,7 @@
 // Cloudinary configuration
 // Replace with your actual Cloudinary cloud name
-const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
-const CLOUDINARY_UPLOAD_PRESET = "YOUR_UPLOAD_PRESET"; // Create an unsigned upload preset in Cloudinary
+const CLOUDINARY_CLOUD_NAME = "dk9hvsxsu";
+const CLOUDINARY_UPLOAD_PRESET = "images"; // Create an unsigned upload preset in Cloudinary
 
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   const formData = new FormData();
