@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Property } from "@/types/property";
 import { MapPin, Maximize2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getOptimizedImageUrl } from "@/lib/imageOptimization";
 
 interface PropertyCardProps {
   property: Property;
@@ -33,9 +34,10 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         <div className="aspect-video relative overflow-hidden bg-muted">
           {property.images && property.images.length > 0 ? (
             <img
-              src={property.images[0]}
+              src={getOptimizedImageUrl(property.images[0], { width: 400, height: 300 })}
               alt={property.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground">

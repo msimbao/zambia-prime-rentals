@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { firestore, checkPremiumStatus } from "@/lib/firebase";
+import { firestore } from "@/lib/firebase";
 import { Property } from "@/types/property";
 import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
@@ -27,20 +27,28 @@ const Index = () => {
       try {
         const snapshot = await firestore().collection("properties").get();
         const propertyList: Property[] = [];
+        const now = new Date();
 
-        for (const doc of snapshot.docs) {
+        snapshot.docs.forEach((doc) => {
           const data = doc.data();
-          const ownerPremium = await checkPremiumStatus(data.ownerId);
+          
+          // Check premium status from denormalized data
+          // If ownerIsPremium is undefined (old properties), include them for backward compatibility
+          const isPremiumActive = data.ownerIsPremium === undefined || 
+            (data.ownerIsPremium && 
+             data.ownerPremiumExpiry && 
+             data.ownerPremiumExpiry.toDate() > now);
 
-          if (ownerPremium) {
+          if (isPremiumActive) {
             propertyList.push({
               id: doc.id,
               ...data,
               createdAt: data.createdAt?.toDate(),
               updatedAt: data.updatedAt?.toDate(),
+              ownerPremiumExpiry: data.ownerPremiumExpiry?.toDate(),
             } as Property);
           }
-        }
+        });
 
         setProperties(propertyList);
         setFilteredProperties(propertyList);
