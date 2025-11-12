@@ -15,6 +15,8 @@ export interface Property {
   ownerId: string;
   ownerName: string;
   ownerPhone?: string;
+  ownerIsPremium?: boolean;
+  ownerPremiumExpiry?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
