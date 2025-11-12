@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Home, Plus, User, LogOut, Crown } from "lucide-react";
+import { Home, Plus, User, LogOut, Crown, Menu, Info } from "lucide-react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +12,85 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Navbar = () => {
   const { currentUser, userData, isPremium, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const MenuContent = () => (
+    <div className="flex flex-col space-y-4">
+      <Link 
+        to="/" 
+        className="flex items-center space-x-2 hover:text-primary transition-colors"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <Home className="h-5 w-5" />
+        <span>Home</span>
+      </Link>
+      
+      <Link 
+        to="/about" 
+        className="flex items-center space-x-2 hover:text-primary transition-colors"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <Info className="h-5 w-5" />
+        <span>About Us</span>
+      </Link>
+
+      {currentUser && isPremium && (
+        <Link 
+          to="/add-property"
+          className="flex items-center space-x-2 hover:text-primary transition-colors"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add Property</span>
+        </Link>
+      )}
+
+      {currentUser && (
+        <>
+          <Link 
+            to="/profile"
+            className="flex items-center space-x-2 hover:text-primary transition-colors"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <User className="h-5 w-5" />
+            <span>Profile</span>
+          </Link>
+
+          <button
+            onClick={() => {
+              logout();
+              setIsMenuOpen(false);
+            }}
+            className="flex items-center space-x-2 hover:text-destructive transition-colors text-left"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
+        </>
+      )}
+
+      {!currentUser && (
+        <Link 
+          to="/auth"
+          className="flex items-center space-x-2 hover:text-primary transition-colors"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <User className="h-5 w-5" />
+          <span>Login / Sign Up</span>
+        </Link>
+      )}
+    </div>
+  );
 
   return (
     <nav className="border-b bg-card sticky top-0 z-50">
@@ -25,18 +102,24 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <div className="flex items-center space-x-4">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-4">
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px]">
+              <SheetHeader className="mb-6">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <MenuContent />
+            </SheetContent>
+          </Sheet>
+
           {currentUser ? (
             <>
-              {isPremium && (
-                <Button asChild variant="default">
-                  <Link to="/add-property">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Property
-                  </Link>
-                </Button>
-              )}
-              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -85,6 +168,23 @@ const Navbar = () => {
               </Button>
             </>
           )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px]">
+              <SheetHeader className="mb-6">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <MenuContent />
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>
