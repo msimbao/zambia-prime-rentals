@@ -33,9 +33,11 @@ const Index = () => {
           const data = doc.data();
           
           // Check premium status from denormalized data
-          const isPremiumActive = data.ownerIsPremium && 
-            data.ownerPremiumExpiry && 
-            data.ownerPremiumExpiry.toDate() > now;
+          // If ownerIsPremium is undefined (old properties), include them for backward compatibility
+          const isPremiumActive = data.ownerIsPremium === undefined || 
+            (data.ownerIsPremium && 
+             data.ownerPremiumExpiry && 
+             data.ownerPremiumExpiry.toDate() > now);
 
           if (isPremiumActive) {
             propertyList.push({
