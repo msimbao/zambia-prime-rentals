@@ -17,10 +17,13 @@ import {
 const Index = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
+  const [displayedProperties, setDisplayedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const PROPERTIES_PER_PAGE = 12;
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -83,7 +86,20 @@ const Index = () => {
     }
 
     setFilteredProperties(filtered);
+    setPage(1); // Reset to first page when filters change
   }, [searchTerm, statusFilter, typeFilter, properties]);
+
+  useEffect(() => {
+    const startIndex = 0;
+    const endIndex = page * PROPERTIES_PER_PAGE;
+    setDisplayedProperties(filteredProperties.slice(startIndex, endIndex));
+  }, [filteredProperties, page]);
+
+  const handleLoadMore = () => {
+    setPage((prev) => prev + 1);
+  };
+
+  const hasMore = displayedProperties.length < filteredProperties.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,11 +182,25 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">No properties found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+            
+            {hasMore && (
+              <div className="flex justify-center mt-12">
+                <Button 
+                  onClick={handleLoadMore} 
+                  size="lg"
+                  className="animate-fade-in"
+                >
+                  Load More Properties
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>
