@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { firestore } from "@/lib/firebase";
 import { uploadMultipleToCloudinary } from "@/lib/cloudinary";
+import { compressMultipleImages, CompressionProgress } from "@/lib/imageOptimization";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ const AddProperty = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
   const [isLoading, setIsLoading] = useState(false);
+  const [compressionProgress, setCompressionProgress] = useState<CompressionProgress | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -35,7 +37,38 @@ const AddProperty = () => {
     ownerPhone: "",
   });
 
-  if (false) {
+  useEffect(() => {
+    if (editId) {
+      loadProperty(editId);
+    }
+  }, [editId]);
+
+  const loadProperty = async (propertyId: string) => {
+    try {
+      const doc = await firestore().collection("properties").doc(propertyId).get();
+      if (doc.exists) {
+        const data = doc.data();
+        setFormData({
+          name: data.name,
+          price: data.price.toString(),
+          status: data.status,
+          type: data.type,
+          location: data.location,
+          size: data.size.toString(),
+          sizeUnit: data.sizeUnit,
+          description: data.description,
+          ownerPhone: data.ownerPhone || "",
+        });
+        setExistingImages(data.images || []);
+        setPreviewUrls(data.images || []);
+      }
+    } catch (error) {
+      console.error("Error loading property:", error);
+      toast.error("Failed to load property");
+    }
+  };
+
+  if (!isPremium && !editId) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -88,8 +121,20 @@ const AddProperty = () => {
     setIsLoading(true);
 
     try {
-      // Upload new images to Cloudinary
-      const newImageUrls = images.length > 0 ? await uploadMultipleToCloudinary(images) : [];
+      // Compress images before upload
+      let compressedImages: File[] = [];
+      if (images.length > 0) {
+        toast.info("Compressing images...");
+        compressedImages = await compressMultipleImages(images, (progress) => {
+          setCompressionProgress(progress);
+        });
+        setCompressionProgress(null);
+      }
+
+      // Upload compressed images to Cloudinary
+      const newImageUrls = compressedImages.length > 0 
+        ? await uploadMultipleToCloudinary(compressedImages) 
+        : [];
       const allImageUrls = [...existingImages, ...newImageUrls];
 
       const propertyData = {
@@ -103,6 +148,8 @@ const AddProperty = () => {
         sizeUnit: formData.sizeUnit,
         description: formData.description,
         ownerPhone: formData.ownerPhone,
+        ownerIsPremium: isPremium,
+        ownerPremiumExpiry: userData?.premiumExpiryDate || null,
         updatedAt: new Date(),
       };
 
@@ -312,9 +359,11 @@ const AddProperty = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading 
-                  ? (editId ? "Updating Property..." : "Adding Property...") 
-                  : (editId ? "Update Property" : "Add Property")}
+                {compressionProgress 
+                  ? `Compressing images... ${compressionProgress.percentage}%`
+                  : isLoading 
+                    ? (editId ? "Updating Property..." : "Adding Property...") 
+                    : (editId ? "Update Property" : "Add Property")}
               </Button>
             </form>
           </CardContent>
