@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Home } from "lucide-react";
+import { Home, Gem
+ } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Auth = () => {
@@ -61,9 +62,9 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-          <Home className="h-8 w-8 text-primary" />
+          <Gem className="h-8 w-8 text-primary" />
           <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            ZamProperty
+            Crystal Flame
           </span>
         </Link>
 

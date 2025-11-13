@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { firestore } from "@/lib/firebase";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -156,9 +158,7 @@ const Profile = () => {
                     <Crown className="h-6 w-6 mr-2 text-primary" />
                     Premium Membership
                   </CardTitle>
-                  <CardDescription>
-                    Premium members can add and manage property listings
-                  </CardDescription>
+             
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {isPremium ? (
@@ -175,30 +175,21 @@ const Profile = () => {
                   ) : (
                     <div className="space-y-4">
                       <p className="text-muted-foreground">
-                        Activate premium to start listing properties
+                    Premium members can add and manage their properties
                       </p>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1">
-                          <Label htmlFor="premium-days">Duration (days)</Label>
-                          <Input
-                            id="premium-days"
-                            type="number"
-                            min="1"
-                            value={premiumDays}
-                            onChange={(e) => setPremiumDays(parseInt(e.target.value))}
-                          />
-                        </div>
+                             <Link
+                        to="/premium">
                         <Button
-                          onClick={handleActivatePremium}
+                          // onClick={handleActivatePremium}
                           disabled={isLoading}
                           size="lg"
                           className="mt-6"
                         >
-                          Activate Premium
+                          Get A Premium Membership
                         </Button>
-                      </div>
+                        </Link>
                       <p className="text-xs text-muted-foreground">
-                        Note: In production, this would integrate with a payment system
+                        Note: When your membership ends, your properties will not be listed
                       </p>
                     </div>
                   )}

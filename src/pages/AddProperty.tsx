@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Upload, X } from "lucide-react";
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 const AddProperty = () => {
   const { currentUser, userData, isPremium } = useAuth();
@@ -77,7 +78,7 @@ const AddProperty = () => {
           <p className="text-muted-foreground mb-6">
             You need a premium membership to add properties.
           </p>
-          <Button onClick={() => navigate("/profile")}>Upgrade to Premium</Button>
+          <Button onClick={() => navigate("/premium")}>Upgrade to Premium</Button>
         </div>
       </div>
     );
@@ -180,6 +181,17 @@ const AddProperty = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+            {/* Loading Overlay */}
+      <LoadingOverlay 
+        isLoading={isLoading} 
+        message={compressionProgress 
+          ? "Compressing images..." 
+          : editId 
+            ? "Updating Property..." 
+            : "Adding Property..."}
+        progress={compressionProgress?.percentage || null}
+      />
+      
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <Card>
           <CardHeader>
