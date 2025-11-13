@@ -34,28 +34,8 @@ const Navbar = () => {
         <Home className="h-5 w-5" />
         <span>Home</span>
       </Link>
-      
-      <Link 
-        to="/about" 
-        className="flex items-center space-x-2 hover:text-primary transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        <Info className="h-5 w-5" />
-        <span>About Us</span>
-      </Link>
 
-      {currentUser && isPremium && (
-        <Link 
-          to="/add-property"
-          className="flex items-center space-x-2 hover:text-primary transition-colors"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <Plus className="h-5 w-5" />
-          <span>Add Property</span>
-        </Link>
-      )}
-
-      {currentUser && (
+            {currentUser && (
         <>
           <Link 
             to="/profile"
@@ -78,6 +58,28 @@ const Navbar = () => {
           </button>
         </>
       )}
+      
+      <Link 
+        to="/about" 
+        className="flex items-center space-x-2 hover:text-primary transition-colors"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <Info className="h-5 w-5" />
+        <span>About Us</span>
+      </Link>
+
+      {currentUser && isPremium && (
+        <Link 
+          to="/add-property"
+          className="flex items-center space-x-2 hover:text-primary transition-colors"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add Property</span>
+        </Link>
+      )}
+
+
 
       {!currentUser && (
         <Link 
