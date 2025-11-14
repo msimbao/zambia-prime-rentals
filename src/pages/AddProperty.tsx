@@ -36,6 +36,7 @@ const AddProperty = () => {
     sizeUnit: "m2",
     description: "",
     ownerPhone: "",
+    ownerName: ""
   });
 
   useEffect(() => {
@@ -59,6 +60,7 @@ const AddProperty = () => {
           sizeUnit: data.sizeUnit,
           description: data.description,
           ownerPhone: data.ownerPhone || "",
+          ownerName: data.ownerName || "",
         });
         setExistingImages(data.images || []);
         setPreviewUrls(data.images || []);
@@ -163,7 +165,7 @@ const AddProperty = () => {
         await firestore().collection("properties").add({
           ...propertyData,
           ownerId: currentUser.uid,
-          ownerName: userData?.displayName || "",
+          ownerName: formData.ownerName || userData?.displayName,
           createdAt: new Date(),
         });
         toast.success("Property added successfully!");
@@ -191,7 +193,7 @@ const AddProperty = () => {
             : "Adding Property..."}
         progress={compressionProgress?.percentage || null}
       />
-      
+
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <Card>
           <CardHeader>
@@ -299,6 +301,16 @@ const AddProperty = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ownerName">Owner Name</Label>
+                <Input
+                  id="ownerName"
+                  value={formData.ownerName}
+                  onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
+                  placeholder="Actual Owner (Leave Blank if it is you)"
+                />
               </div>
 
               <div className="space-y-2">
