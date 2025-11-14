@@ -19,7 +19,7 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
 
   const plans = [
     {
-      id: '1-month',
+      id: 'silver',
       duration: 'Silver',
       title:'Get Silver',
       color:'#333',
@@ -34,7 +34,7 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
       ]
     },
     {
-      id: '6-months',
+      id: 'gold',
       duration: 'Gold',
       title:'Get Gold!',
       color:'#EAB308',
@@ -51,7 +51,7 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
       ]
     },
     {
-      id: '1-year',
+      id: 'platinum',
       duration: 'Platinum',
       title: 'Get Platinum!',
       color:'#3B82F6',
