@@ -1,10 +1,14 @@
 export type PropertyStatus = "for_sale" | "for_rent";
-export type PropertyType = "land" | "furnished_apartment" | "apartment" | "house";
+export type PropertyType = "land" | "furnished_apartment" | "apartment" | "house" | "boarding_house";
+export type Currency = "ZMW" | "USD" | "GBP";
+export type PricePeriod = "per_month" | "per_week" | "per_day";
 
 export interface Property {
   id: string;
   name: string;
   price: number;
+  currency: Currency;
+  pricePeriod: PricePeriod;
   images: string[];
   status: PropertyStatus;
   type: PropertyType;

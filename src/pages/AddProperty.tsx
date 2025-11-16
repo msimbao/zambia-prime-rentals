@@ -29,6 +29,8 @@ const AddProperty = () => {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
+    currency: "ZMW",
+    pricePeriod: "per_month",
     status: "for_rent",
     type: "apartment",
     location: "",
@@ -53,6 +55,8 @@ const AddProperty = () => {
         setFormData({
           name: data.name,
           price: data.price.toString(),
+          currency: data.currency || "ZMW",
+          pricePeriod: data.pricePeriod || "per_month",
           status: data.status,
           type: data.type,
           location: data.location,
@@ -143,6 +147,8 @@ const AddProperty = () => {
       const propertyData = {
         name: formData.name,
         price: parseFloat(formData.price),
+        currency: formData.currency,
+        pricePeriod: formData.pricePeriod,
         images: allImageUrls,
         status: formData.status,
         type: formData.type,
@@ -213,9 +219,9 @@ const AddProperty = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (ZMW)</Label>
+                  <Label htmlFor="price">Price</Label>
                   <Input
                     id="price"
                     type="number"
@@ -227,20 +233,54 @@ const AddProperty = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="currency">Currency</Label>
                   <Select
-                    value={formData.status}
-                    onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    value={formData.currency}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="for_rent">For Rent</SelectItem>
-                      <SelectItem value="for_sale">For Sale</SelectItem>
+                      <SelectItem value="ZMW">ZMW</SelectItem>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="GBP">GBP (£)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pricePeriod">Period</Label>
+                  <Select
+                    value={formData.pricePeriod}
+                    onValueChange={(value) => setFormData({ ...formData, pricePeriod: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="per_month">Per Month</SelectItem>
+                      <SelectItem value="per_week">Per Week</SelectItem>
+                      <SelectItem value="per_day">Per Day</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="for_rent">For Rent</SelectItem>
+                    <SelectItem value="for_sale">For Sale</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -256,6 +296,7 @@ const AddProperty = () => {
                     <SelectItem value="house">House</SelectItem>
                     <SelectItem value="apartment">Apartment</SelectItem>
                     <SelectItem value="furnished_apartment">Furnished Apartment</SelectItem>
+                    <SelectItem value="boarding_house">Boarding House</SelectItem>
                     <SelectItem value="land">Land</SelectItem>
                   </SelectContent>
                 </Select>
