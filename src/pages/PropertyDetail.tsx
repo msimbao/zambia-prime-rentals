@@ -6,9 +6,8 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Maximize2, Phone, User, Mail, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
+import { MapPin, Maximize2, Phone, User, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import PropertyMap from "@/components/PropertyMap";
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -149,14 +148,6 @@ const PropertyDetail = () => {
                           </div>
                           <span className="text-lg">{property.location}</span>
                         </div>
-                        {property.address && (
-                          <div className="flex items-center text-gray-600">
-                            <div className="bg-gray-100 p-2 rounded-lg mr-3">
-                              <Navigation className="h-5 w-5 text-primary" />
-                            </div>
-                            <span className="text-lg">{property.address}</span>
-                          </div>
-                        )}
                         <div className="flex items-center text-gray-600">
                           <div className="bg-gray-100 p-2 rounded-lg mr-3">
                             <Maximize2 className="h-5 w-5 text-primary" />
@@ -231,25 +222,6 @@ const PropertyDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Location Map */}
-              {property.address && (
-                <Card className="border-0 shadow-xl bg-white">
-                  <CardContent className="p-6 md:p-8">
-                    <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center">
-                      <div className="bg-primary/10 p-2 rounded-lg mr-3">
-                        <MapPin className="h-6 w-6 text-primary" />
-                      </div>
-                      Location
-                    </h3>
-                    <PropertyMap 
-                      address={property.address} 
-                      location={property.location}
-                      propertyName={property.name}
-                    />
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* Contact Card - Sticky on Desktop */}

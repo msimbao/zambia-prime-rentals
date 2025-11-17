@@ -34,7 +34,6 @@ const AddProperty = () => {
     status: "for_rent",
     type: "apartment",
     location: "",
-    address: "",
     size: "",
     sizeUnit: "m2",
     description: "",
@@ -61,7 +60,6 @@ const AddProperty = () => {
           status: data.status,
           type: data.type,
           location: data.location,
-          address: data.address || "",
           size: data.size.toString(),
           sizeUnit: data.sizeUnit,
           description: data.description,
@@ -155,7 +153,6 @@ const AddProperty = () => {
         status: formData.status,
         type: formData.type,
         location: formData.location,
-        address: formData.address,
         size: parseFloat(formData.size),
         sizeUnit: formData.sizeUnit,
         description: formData.description,
@@ -316,16 +313,6 @@ const AddProperty = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Physical Address</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="e.g., Plot 123, Main Street"
-                />
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="size">Size</Label>
@@ -352,7 +339,6 @@ const AddProperty = () => {
                       <SelectItem value="m2">m²</SelectItem>
                       <SelectItem value="sqf">sqf</SelectItem>
                       <SelectItem value="ha">ha</SelectItem>
-                      <SelectItem value="bedroom">bedroom</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

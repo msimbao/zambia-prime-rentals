@@ -13,7 +13,6 @@ export interface Property {
   status: PropertyStatus;
   type: PropertyType;
   location: string;
-  address?: string;
   size: number;
   sizeUnit: "ha" | "m2" | "sqf";
   description: string;
