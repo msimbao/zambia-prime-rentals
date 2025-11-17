@@ -339,6 +339,7 @@ const AddProperty = () => {
                       <SelectItem value="m2">m²</SelectItem>
                       <SelectItem value="sqf">sqf</SelectItem>
                       <SelectItem value="ha">ha</SelectItem>
+                      <SelectItem value="bedroom">bedroom</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
