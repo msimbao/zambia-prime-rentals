@@ -288,7 +288,7 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
         </div>
 
         {/* Dev Premium */}
-        <div className="bg-amber-100 border-2 border-amber-400 rounded-2xl p-6">
+        {/* <div className="bg-amber-100 border-2 border-amber-400 rounded-2xl p-6">
           <h3 className="text-xl font-extrabold text-amber-900 mb-2">🛠️ Development Testing</h3>
           <p className="text-sm text-amber-800 font-medium mb-4">
             Activate 24-hour premium access for testing purposes
@@ -308,7 +308,7 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
               'Activate Dev Premium (1 Day)'
             )}
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Benefits Section */}

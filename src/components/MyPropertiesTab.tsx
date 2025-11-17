@@ -26,6 +26,20 @@ const MyPropertiesTab = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+    const formatPrice = (price: number, currency: string) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "ZMW",
+    }).format(price);
+  };
+
+    const formatType = (type: string) => {
+    return type
+      .split("_")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   useEffect(() => {
     fetchProperties();
   }, [currentUser]);
@@ -130,8 +144,11 @@ const MyPropertiesTab = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-xl font-bold text-primary">
-                        K{property.price.toLocaleString()}
+                        {formatPrice(property.price, property.currency)}
                       </p>
+                        {property.status === "for_rent" && (
+              <span className="text-sm text-gray-500 ml-1 font-medium">/{formatType(property.pricePeriod || "month")}</span>
+            )}
                     </div>
                   </div>
 

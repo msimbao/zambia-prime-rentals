@@ -77,10 +77,10 @@ const PropertyDetail = () => {
     );
   }
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "ZMW",
+      currency: currency || "ZMW",
     }).format(price);
   };
 
@@ -159,10 +159,10 @@ const PropertyDetail = () => {
                     <div className="text-left md:text-right">
                      <div className="flex items-baseline mb-3">
   <p className="text-2xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
-    {formatPrice(property.price)}
+    {formatPrice(property.price, property.currency)}
   </p>
   {property.status === "for_rent" && (
-    <span className="text-sm text-gray-500 ml-1 font-medium">/month</span>
+    <span className="text-sm text-gray-500 ml-1 font-medium">/{formatType(property.pricePeriod || "month")}</span>
   )}
 </div>
                       <div className="flex gap-2">

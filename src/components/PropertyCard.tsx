@@ -10,10 +10,10 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "ZMW",
+      currency: currency || "ZMW",
     }).format(price);
   };
 
@@ -67,10 +67,10 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           
           <div className="flex items-baseline mb-4">
             <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
-              {formatPrice(property.price)}
+              {formatPrice(property.price, property.currency)}
             </p>
             {property.status === "for_rent" && (
-              <span className="text-sm text-gray-500 ml-1 font-medium">/month</span>
+              <span className="text-sm text-gray-500 ml-1 font-medium">/{formatType(property.pricePeriod || "month")}</span>
             )}
           </div>
           
