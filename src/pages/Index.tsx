@@ -184,6 +184,8 @@ const Index = () => {
                       <SelectItem value="house">House</SelectItem>
                       <SelectItem value="apartment">Apartment</SelectItem>
                       <SelectItem value="furnished_apartment">Furnished Apartment</SelectItem>
+                      <SelectItem value="office_space">Office Space</SelectItem>
+                      <SelectItem value="boarding_house">Boarding House</SelectItem>
                       <SelectItem value="land">Land</SelectItem>
                     </SelectContent>
                   </Select>

@@ -229,12 +229,12 @@ const PropertyDetail = () => {
               <Card className="sticky top-4 border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div className="text-center pb-4 border-b-2 border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Owner</h2>
-                    <p className="text-gray-600">Get in touch to schedule a viewing</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Get In Touch!</h2>
+                    <p className="text-gray-600">Call us on Whatsapp or Directly to Schedule a Viewing</p>
                   </div>
                   
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                    {/* <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
                       <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
                         <User className="h-6 w-6 text-white" />
                       </div>
@@ -242,9 +242,10 @@ const PropertyDetail = () => {
                         <p className="text-sm text-gray-600 mb-1">Owner</p>
                         <p className="font-semibold text-gray-900 text-lg">{property.ownerName}</p>
                       </div>
-                    </div>
+                    </div> */}
+
                     
-                    {property.ownerPhone && (
+                    {/* {property.ownerPhone && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
                         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-lg">
                           <Phone className="h-6 w-6 text-white" />
@@ -259,26 +260,84 @@ const PropertyDetail = () => {
                           </a>
                         </div>
                       </div>
-                    )}
+                    )} */}
+
+                      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-lg">
+                          <Phone className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">WhatsApp Line</p>
+                          <a  >
+                            +260 971897512
+                        
+                          </a>
+                        </div>
+                      </div>
+
+
+                      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-lg">
+                          <Phone className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Mobile Line 1</p>
+                          <a  >
+                            
+                            +260 750105948
+                          </a>
+                        </div>
+                      </div>
+
+
+                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                        <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 p-3 rounded-xl shadow-lg">
+                          <Phone className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Mobile Line 2</p>
+                          <a  >
+                            
+                            +260 961507104
+                          </a>
+                        </div>
+                      </div>
+
+
+                      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+                          <Mail className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Email</p>
+                          <a  className="text-sm">
+                            crystalflamerealestate@gmail.com
+                        
+                          </a>
+                        </div>
+                      </div>
+
+                  
+
                   </div>
                   
                   <div className="space-y-3 pt-4">
-                    <Button 
+                    {/* <Button 
                       className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       size="lg"
-                      onClick={() => window.location.href = `tel:${property.ownerPhone}`}
+                      onClick={() => window.location.href = `tel:+260971897512`}
                     >
                       <Phone className="mr-2 h-5 w-5" />
                       Call Now
-                    </Button>
-                    <Button 
+                    </Button> */}
+                    {/* <Button 
                       variant="outline"
                       className="w-full h-14 text-lg font-semibold border-2 hover:bg-gray-50"
                       size="lg"
                     >
                       <Mail className="mr-2 h-5 w-5" />
                       Send Message
-                    </Button>
+                    </Button> */}
                   </div>
 
                   <div className="pt-4 border-t-2 border-gray-100">
