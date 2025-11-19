@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { firestore } from "@/lib/firebase";
-import { uploadMultipleToCloudinary } from "@/lib/cloudinary";
+import { uploadToCloudinary, uploadMultipleToCloudinary } from "@/lib/cloudinary";
 import { compressMultipleImages, CompressionProgress } from "@/lib/imageOptimization";
+import { PREMIUM_TIERS } from "@/config/premiumTiers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,11 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Video, AlertCircle } from "lucide-react";
 import LoadingOverlay from '@/components/LoadingOverlay';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AddProperty = () => {
-  const { currentUser, userData, isPremium } = useAuth();
+  const { currentUser, userData, isPremium, premiumTier } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -25,6 +27,14 @@ const AddProperty = () => {
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [videos, setVideos] = useState<File[]>([]);
+  const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
+  const [existingVideos, setExistingVideos] = useState<string[]>([]);
+
+  // Get tier limits
+  const tierLimits = premiumTier && PREMIUM_TIERS[premiumTier as keyof typeof PREMIUM_TIERS]
+    ? PREMIUM_TIERS[premiumTier as keyof typeof PREMIUM_TIERS]
+    : PREMIUM_TIERS.silver;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -67,7 +77,9 @@ const AddProperty = () => {
           ownerName: data.ownerName || "",
         });
         setExistingImages(data.images || []);
+        setExistingVideos(data.videos || []);
         setPreviewUrls(data.images || []);
+        setVideoPreviewUrls(data.videos || []);
       }
     } catch (error) {
       console.error("Error loading property:", error);
@@ -92,8 +104,10 @@ const AddProperty = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + images.length > 10) {
-      toast.error("Maximum 10 images allowed");
+    const totalImages = existingImages.length + images.length + files.length;
+    
+    if (totalImages > tierLimits.maxImages) {
+      toast.error(`Your ${tierLimits.name} plan allows maximum ${tierLimits.maxImages} images per property`);
       return;
     }
 
@@ -101,6 +115,36 @@ const AddProperty = () => {
     
     const newPreviewUrls = files.map(file => URL.createObjectURL(file));
     setPreviewUrls([...previewUrls, ...newPreviewUrls]);
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalVideos = existingVideos.length + videos.length + files.length;
+    
+    if (totalVideos > tierLimits.maxVideos) {
+      toast.error(`Your ${tierLimits.name} plan allows maximum ${tierLimits.maxVideos} videos per property`);
+      return;
+    }
+
+    // Validate file size (max 100MB per video)
+    const invalidFiles = files.filter(file => file.size > 100 * 1024 * 1024);
+    if (invalidFiles.length > 0) {
+      toast.error("Video files must be less than 100MB each");
+      return;
+    }
+
+    // Validate file format
+    const validFormats = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+    const invalidFormats = files.filter(file => !validFormats.includes(file.type));
+    if (invalidFormats.length > 0) {
+      toast.error("Only MP4, MOV, and AVI video formats are supported");
+      return;
+    }
+
+    setVideos([...videos, ...files]);
+    
+    const newVideoPreviewUrls = files.map(file => URL.createObjectURL(file));
+    setVideoPreviewUrls([...videoPreviewUrls, ...newVideoPreviewUrls]);
   };
 
   const removeImage = (index: number) => {
@@ -115,6 +159,20 @@ const AddProperty = () => {
     const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
     setExistingImages(newExistingImages);
     setPreviewUrls(newPreviewUrls);
+  };
+
+  const removeVideo = (index: number) => {
+    const newVideos = videos.filter((_, i) => i !== index);
+    const newVideoPreviewUrls = videoPreviewUrls.filter((_, i) => i !== index);
+    setVideos(newVideos);
+    setVideoPreviewUrls(newVideoPreviewUrls);
+  };
+
+  const removeExistingVideo = (index: number) => {
+    const newExistingVideos = existingVideos.filter((_, i) => i !== index);
+    const newVideoPreviewUrls = videoPreviewUrls.filter((_, i) => i !== index);
+    setExistingVideos(newExistingVideos);
+    setVideoPreviewUrls(newVideoPreviewUrls);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,12 +202,25 @@ const AddProperty = () => {
         : [];
       const allImageUrls = [...existingImages, ...newImageUrls];
 
+      // Upload videos to Cloudinary
+      let newVideoUrls: string[] = [];
+      if (videos.length > 0) {
+        toast.info("Uploading videos...");
+        newVideoUrls = await Promise.all(
+          videos.map(async (video) => {
+            return await uploadToCloudinary(video);
+          })
+        );
+      }
+      const allVideoUrls = [...existingVideos, ...newVideoUrls];
+
       const propertyData = {
         name: formData.name,
         price: parseFloat(formData.price),
         currency: formData.currency,
         pricePeriod: formData.pricePeriod,
         images: allImageUrls,
+        videos: allVideoUrls,
         status: formData.status,
         type: formData.type,
         location: formData.location,
@@ -158,6 +229,7 @@ const AddProperty = () => {
         description: formData.description,
         ownerPhone: formData.ownerPhone,
         ownerIsPremium: isPremium,
+        ownerPremiumTier: premiumTier,
         ownerPremiumExpiry: userData?.premiumExpiryDate || null,
         updatedAt: new Date(),
       };
@@ -379,7 +451,14 @@ const AddProperty = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Images (Max 10)</Label>
+                <Label>Images (Max {tierLimits.maxImages})</Label>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Your {tierLimits.name} plan allows up to {tierLimits.maxImages} images and {tierLimits.maxVideos} videos per property.
+                    {existingImages.length + images.length}/{tierLimits.maxImages} images used
+                  </AlertDescription>
+                </Alert>
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   <input
                     type="file"
@@ -388,11 +467,17 @@ const AddProperty = () => {
                     onChange={handleImageChange}
                     className="hidden"
                     id="image-upload"
+                    disabled={existingImages.length + images.length >= tierLimits.maxImages}
                   />
-                  <label htmlFor="image-upload" className="cursor-pointer">
+                  <label 
+                    htmlFor="image-upload" 
+                    className={existingImages.length + images.length >= tierLimits.maxImages ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+                  >
                     <Upload className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
-                      Click to upload {existingImages.length > 0 ? "more images" : "images"}
+                      {existingImages.length + images.length >= tierLimits.maxImages 
+                        ? "Maximum images reached" 
+                        : `Click to upload ${existingImages.length > 0 ? "more images" : "images"}`}
                     </p>
                   </label>
                 </div>
@@ -424,6 +509,67 @@ const AddProperty = () => {
                   </div>
                 )}
               </div>
+
+              {tierLimits.maxVideos > 0 && (
+                <div className="space-y-2">
+                  <Label>Videos (Max {tierLimits.maxVideos})</Label>
+                  <Alert>
+                    <Video className="h-4 w-4" />
+                    <AlertDescription>
+                      {existingVideos.length + videos.length}/{tierLimits.maxVideos} videos used. Max 100MB per video.
+                    </AlertDescription>
+                  </Alert>
+                  <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept="video/mp4,video/mov,video/avi,video/quicktime"
+                      multiple
+                      onChange={handleVideoChange}
+                      className="hidden"
+                      id="video-upload"
+                      disabled={existingVideos.length + videos.length >= tierLimits.maxVideos}
+                    />
+                    <label 
+                      htmlFor="video-upload" 
+                      className={existingVideos.length + videos.length >= tierLimits.maxVideos ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+                    >
+                      <Video className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {existingVideos.length + videos.length >= tierLimits.maxVideos 
+                          ? "Maximum videos reached" 
+                          : `Click to upload ${existingVideos.length > 0 ? "more videos" : "videos"}`}
+                      </p>
+                    </label>
+                  </div>
+
+                  {videoPreviewUrls.length > 0 && (
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      {videoPreviewUrls.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <video
+                            src={url}
+                            className="w-full h-32 object-cover rounded-lg"
+                            controls
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (index < existingVideos.length) {
+                                removeExistingVideo(index);
+                              } else {
+                                removeVideo(index - existingVideos.length);
+                              }
+                            }}
+                            className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {compressionProgress 
