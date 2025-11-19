@@ -128,9 +128,29 @@ const PropertyDetail = () => {
             
             {/* Image Counter */}
             <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
-              {property.images.length} Photos
+              {property.images.length} Photos {property.videos && property.videos.length > 0 && `• ${property.videos.length} Videos`}
             </div>
           </div>
+
+          {/* Videos Section */}
+          {property.videos && property.videos.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-xl font-bold mb-4">Property Videos</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {property.videos.map((video, index) => (
+                  <div key={index} className="aspect-video rounded-xl overflow-hidden shadow-lg">
+                    <video
+                      src={video}
+                      controls
+                      className="w-full h-full object-cover"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
             {/* Main Content */}

@@ -6,6 +6,7 @@ interface AuthContextType {
   currentUser: any;
   userData: User | null;
   isPremium: boolean;
+  premiumTier: string | undefined;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName: string) => Promise<void>;
@@ -27,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userData, setUserData] = useState<User | null>(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [premiumTier, setPremiumTier] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   const refreshPremiumStatus = async () => {
@@ -50,16 +52,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             displayName: data.displayName,
             photoURL: data.photoURL,
             isPremium: data.isPremium || false,
+            premiumTier: data.premiumTier,
             premiumExpiryDate: data.premiumExpiryDate?.toDate(),
             createdAt: data.createdAt?.toDate(),
           } as User);
           
           const premium = await checkPremiumStatus(user.uid);
           setIsPremium(premium);
+          setPremiumTier(data.premiumTier);
         }
       } else {
         setUserData(null);
         setIsPremium(false);
+        setPremiumTier(undefined);
       }
       
       setLoading(false);
@@ -93,6 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     currentUser,
     userData,
     isPremium,
+    premiumTier,
     loading,
     login,
     signup,

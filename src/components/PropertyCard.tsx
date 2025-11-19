@@ -50,13 +50,18 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           {/* Gradient overlay for better badge visibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
           
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 flex gap-2">
             <Badge 
               variant={property.status === "for_sale" ? "default" : "secondary"}
               className="shadow-lg backdrop-blur-sm bg-opacity-95 px-3 py-1.5 text-xs font-semibold"
             >
               {formatStatus(property.status)}
             </Badge>
+            {property.videos && property.videos.length > 0 && (
+              <Badge className="shadow-lg backdrop-blur-sm bg-opacity-95 px-2 py-1.5">
+                🎥 {property.videos.length}
+              </Badge>
+            )}
           </div>
         </div>
         

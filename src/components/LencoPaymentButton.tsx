@@ -1,3 +1,4 @@
+/// <reference path="../types/lenco.d.ts" />
 import React, { useEffect, useState } from 'react';
 
 // Custom hook that loads the script and returns the payment function

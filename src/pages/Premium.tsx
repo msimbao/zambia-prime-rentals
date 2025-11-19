@@ -5,11 +5,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 
+import { PREMIUM_TIERS } from "@/config/premiumTiers";
 import LencoPaymentButton from '../components/LencoPaymentButton';
 
-import { ChevronLeft, Crown, Rocket, BarChart3, Zap, Target } from 'lucide-react';
+import { ChevronLeft, Crown, Rocket, BarChart3, Zap, Target, Check } from 'lucide-react';
 
-export default function Premium({ onBack, user, profile, updateProfile, dbRef, dbUpdate }) {
+export default function Premium() {
       const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -23,67 +24,50 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
       duration: 'Silver',
       title:'Get Silver',
       color:'#333',
-      price: 250,
+      price: PREMIUM_TIERS.silver.price,
       period: 'month',
       months: 1,
       popular: false,
-      features: [
-        'Featured listings placement',
-        'Social Media Promotion',
-        '4 promotions per month',
-      ]
+      features: PREMIUM_TIERS.silver.features
     },
     {
       id: 'gold',
       duration: 'Gold',
       title:'Get Gold!',
       color:'#EAB308',
-      price: 350,
+      price: PREMIUM_TIERS.gold.price,
       period: 'month',
       months: 6,
       popular: false,
-    //   savings: 'Save ZMW 200',
-      features: [
-        'Featured listings placement',
-        'Premium badge on listings',
-        'Social Media Promotion',
-        '8 promotions per month',
-      ]
+      features: PREMIUM_TIERS.gold.features
     },
     {
       id: 'platinum',
       duration: 'Platinum',
       title: 'Get Platinum!',
       color:'#3B82F6',
-      price: 450,
+      price: PREMIUM_TIERS.platinum.price,
       period: 'month',
       months: 12,
       popular: true,
-    //   savings: 'Save ZMW 600',
-      features: [
-        'Featured listings placement',
-        'Premium badge on listings',
-        'Social Media Promotion',
-        '12 promotions per month',
-        'Priority support'
-      ]
+      features: PREMIUM_TIERS.platinum.features
     }
   ];
 
-  const calculateNewPremiumDate = (months) => {
+  const calculateNewPremiumDate = (months: number) => {
     const now = new Date();
-    const currentPremiumDate = profile?.premiumUntil ? new Date(profile.premiumUntil) : now;
+    const currentPremiumDate = userData?.premiumExpiryDate ? new Date(userData.premiumExpiryDate) : now;
     
     const startDate = currentPremiumDate > now ? currentPremiumDate : now;
     
     const newDate = new Date(startDate);
     newDate.setMonth(newDate.getMonth() + months);
-    return newDate.toISOString();
+    return newDate;
   };
 
-  const handlePurchase = async (plan) => {
-    if (!user) {
-      alert('Please log in to purchase premium');
+  const handlePurchase = async (plan: any) => {
+    if (!currentUser) {
+      toast.error('Please log in to purchase premium');
       return;
     }
 
@@ -93,26 +77,22 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
     try {
       const newPremiumDate = calculateNewPremiumDate(plan.months);
       
-      // Update premiumUntil in Firebase
-      const userRef = dbRef(`profiles/${user.uid}`);
-      await dbUpdate(userRef, {
-        premiumUntil: newPremiumDate,
-        last_premium_purchase: new Date().toISOString(),
-        premium_plan: plan.id
+      // Update user document in Firestore
+      await firestore().collection('users').doc(currentUser.uid).update({
+        isPremium: true,
+        premiumTier: plan.id,
+        premiumExpiryDate: newPremiumDate,
+        lastPremiumPurchase: new Date(),
       });
 
-      // Update local profile
-      await updateProfile({
-        premiumUntil: newPremiumDate,
-        premium_plan: plan.id
-      });
+      await refreshPremiumStatus();
 
-      alert(`Success! 🎉\n\nYou're now premium for ${plan.duration}!\n\nYour premium access expires on ${new Date(newPremiumDate).toLocaleDateString()}`);
+      toast.success(`Success! You're now ${plan.duration} premium until ${newPremiumDate.toLocaleDateString()}`);
       
-      if (onBack) onBack();
+      navigate('/');
     } catch (error) {
       console.error('Error purchasing premium:', error);
-      alert('Error: Failed to process premium purchase. Please try again.');
+      toast.error('Failed to process premium purchase. Please try again.');
     } finally {
       setIsProcessing(false);
       setSelectedPlan(null);
@@ -221,16 +201,16 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
           )}
         </button> */}
         <LencoPaymentButton
-  publicKey="pub-cc9bf023e28953d13294230f6cc32c3a02ce0ab32fae80bf"
-  email="user@example.com"
-  amount={plan.price}
-  title={plan.title}
-  backgroundColor={plan.color}
-  onSuccess={async (res) => {
-          console.log("Payment Success:", res);
-                          await handleActivatePremium();    
-        }}
-/>
+          publicKey="pk_live_3ca99b10-4e01-11ef-803e-8f5c7f6d94a0"
+          reference={`${plan.id}-${currentUser?.uid}-${Date.now()}`}
+          email={currentUser?.email || 'user@example.com'}
+          amount={plan.price}
+          title={plan.title}
+          backgroundColor={plan.color}
+          onSuccess={async (res: any) => {
+            await handlePurchase(plan);
+          }}
+        />
       </div>
     );
   };
@@ -250,14 +230,10 @@ export default function Premium({ onBack, user, profile, updateProfile, dbRef, d
           <div className="flex items-center justify-between">
             <Link
             to="/profile"
-            >
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl border border-white/20 transition-all"
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl border border-white/20 transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
               <span className="font-semibold text-sm">Back</span>
-            </button>
             </Link>
             
             
