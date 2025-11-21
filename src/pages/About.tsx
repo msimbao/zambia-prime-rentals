@@ -168,7 +168,7 @@ const About = () => {
                 <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <Phone className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">Whatsapp Us</h3>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900">WhatsApp Us</h3>
                 <a 
                   href="tel:+260123456789" 
                   className="text-primary hover:text-primary/80 transition-colors text-lg font-medium"
