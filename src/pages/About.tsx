@@ -156,9 +156,9 @@ const About = () => {
                 <h3 className="text-xl font-semibold mb-3 text-gray-900">Email Us</h3>
                 <a 
                   href="mailto:info@crystalflame.com" 
-                  className="text-primary hover:text-primary/80 transition-colors text-lg font-medium"
+                  className="text-primary hover:text-primary/80 transition-colors text-sm font-medium"
                 >
-                  info@crystalflame.com
+                  crystalflamerealestate@gmail.com
                 </a>
               </CardContent>
             </Card>
@@ -168,12 +168,12 @@ const About = () => {
                 <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <Phone className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">Call Us</h3>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900">Whatsapp Us</h3>
                 <a 
                   href="tel:+260123456789" 
                   className="text-primary hover:text-primary/80 transition-colors text-lg font-medium"
                 >
-                  +260 123 456 789
+                  +260 971897512
                 </a>
               </CardContent>
             </Card>
@@ -181,11 +181,11 @@ const About = () => {
             <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <CardContent className="p-8 text-center">
                 <div className="bg-gradient-to-br from-amber-500 to-amber-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <MapPin className="h-8 w-8 text-white" />
+                  <Phone className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">Visit Us</h3>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900">Call Us</h3>
                 <p className="text-gray-600 text-lg">
-                  Lusaka, Zambia
+                  +260 750105948
                 </p>
               </CardContent>
             </Card>
