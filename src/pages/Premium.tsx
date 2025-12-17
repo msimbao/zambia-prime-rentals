@@ -138,6 +138,27 @@ export default function Premium() {
       }
     };
 
+    const updateUserProperties = async (newExpiryDate: Date, tier: string) => {
+  // Get all properties owned by current user
+  const propertiesSnapshot = await firestore()
+    .collection('properties')
+    .where('ownerId', '==', currentUser.uid)
+    .get();
+
+  // Update each property with new premium info
+  const batch = firestore().batch();
+  propertiesSnapshot.docs.forEach((doc) => {
+    batch.update(doc.ref, {
+      ownerIsPremium: true,
+      ownerPremiumExpiry: newExpiryDate,
+      ownerPremiumTier: tier,
+    });
+  });
+
+  await batch.commit();
+};
+    
+
     // ========== DEVELOPER ONLY - COMMENT OUT BEFORE GOING LIVE ==========
     const handleDevPermanentPremium = async () => {
       if (!currentUser) return;
@@ -154,6 +175,7 @@ export default function Premium() {
         });
   
         await refreshPremiumStatus();
+        updateUserProperties(permanentDate,'platinum')
         toast.success('🚀 Developer permanent premium activated!');
       } catch (error) {
         console.error("Error activating dev premium:", error);
