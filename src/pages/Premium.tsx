@@ -138,6 +138,32 @@ export default function Premium() {
       }
     };
 
+    // ========== DEVELOPER ONLY - COMMENT OUT BEFORE GOING LIVE ==========
+    const handleDevPermanentPremium = async () => {
+      if (!currentUser) return;
+  
+      setIsLoading(true);
+      try {
+        // Set expiry date to year 2099 for permanent access
+        const permanentDate = new Date('2099-12-31');
+  
+        await firestore().collection("users").doc(currentUser.uid).update({
+          isPremium: true,
+          premiumTier: 'platinum',
+          premiumExpiryDate: permanentDate,
+        });
+  
+        await refreshPremiumStatus();
+        toast.success('🚀 Developer permanent premium activated!');
+      } catch (error) {
+        console.error("Error activating dev premium:", error);
+        toast.error("Failed to activate dev premium");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    // ========== END DEVELOPER ONLY ==========
+
   const PricingCard = ({ plan }) => {
     const isSelected = selectedPlan === plan.id;
     const isLoading = isProcessing && isSelected;
@@ -263,28 +289,29 @@ export default function Premium() {
           ))}
         </div>
 
-        {/* Dev Premium */}
-        {/* <div className="bg-amber-100 border-2 border-amber-400 rounded-2xl p-6">
-          <h3 className="text-xl font-extrabold text-amber-900 mb-2">🛠️ Development Testing</h3>
-          <p className="text-sm text-amber-800 font-medium mb-4">
-            Activate 24-hour premium access for testing purposes
+        {/* ========== DEVELOPER ONLY - COMMENT OUT BEFORE GOING LIVE ========== */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 border-2 border-purple-400 rounded-2xl p-6 mt-6">
+          <h3 className="text-xl font-extrabold text-white mb-2">🔐 Developer Permanent Access</h3>
+          <p className="text-sm text-purple-100 font-medium mb-4">
+            Grant yourself permanent Platinum premium access (expires 2099)
           </p>
           <button
-            onClick={handleActivatePremium}
-            disabled={isProcessing}
-            className={`w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl transition-all ${
-              isProcessing && selectedPlan === 'dev' ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
+            onClick={handleDevPermanentPremium}
+            disabled={isLoading}
+            className={`w-full bg-white hover:bg-gray-100 text-purple-700 font-bold py-3.5 rounded-xl transition-all ${
+              isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
             }`}
           >
-            {isProcessing && selectedPlan === 'dev' ? (
+            {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-600 border-t-transparent" />
               </div>
             ) : (
-              'Activate Dev Premium (1 Day)'
+              '🚀 Activate Permanent Premium'
             )}
           </button>
-        </div> */}
+        </div>
+        {/* ========== END DEVELOPER ONLY ========== */}
       </div>
 
       {/* Benefits Section */}
