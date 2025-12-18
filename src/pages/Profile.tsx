@@ -1,27 +1,23 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-
 import { useAuth } from "@/contexts/AuthContext";
-import { firestore } from "@/lib/firebase";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { firestore } from "@/lib/firebase";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Crown, Upload, Calendar } from "lucide-react";
+import { Upload } from "lucide-react";
 import MyPropertiesTab from "@/components/MyPropertiesTab";
 
 const Profile = () => {
-  const { currentUser, userData, isPremium, refreshPremiumStatus } = useAuth();
+  const { currentUser, userData } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [premiumDays, setPremiumDays] = useState(30);
 
   useEffect(() => {
     if (userData?.photoURL) {
@@ -56,37 +52,6 @@ const Profile = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleActivatePremium = async () => {
-    if (!currentUser) return;
-
-    setIsLoading(true);
-    try {
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + premiumDays);
-
-      await firestore().collection("users").doc(currentUser.uid).update({
-        isPremium: true,
-        premiumExpiryDate: expiryDate,
-      });
-
-      await refreshPremiumStatus();
-      toast.success(`Premium activated for ${premiumDays} days!`);
-    } catch (error) {
-      console.error("Error activating premium:", error);
-      toast.error("Failed to activate premium");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getDaysRemaining = () => {
-    if (!userData?.premiumExpiryDate) return 0;
-    const now = new Date();
-    const expiry = new Date(userData.premiumExpiryDate);
-    const diff = expiry.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
   return (
@@ -154,45 +119,18 @@ const Profile = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Crown className="h-6 w-6 mr-2 text-primary" />
-                    Premium Membership
-                  </CardTitle>
-             
+                  <CardTitle>Listing Your Properties</CardTitle>
+                  <CardDescription>
+                    Each property listing requires a one-time payment based on the tier you choose
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {isPremium ? (
-                    <div className="space-y-4">
-                      <Badge className="text-lg py-2 px-4">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Active Premium Member
-                      </Badge>
-                      <div className="flex items-center text-muted-foreground">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>{getDaysRemaining()} days remaining</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <p className="text-muted-foreground">
-                    Premium members can add and manage their properties
-                      </p>
-                             <Link
-                        to="/premium">
-                        <Button
-                          // onClick={handleActivatePremium}
-                          disabled={isLoading}
-                          size="lg"
-                          className="mt-6"
-                        >
-                          Get A Premium Membership
-                        </Button>
-                        </Link>
-                      <p className="text-xs text-muted-foreground">
-                        Note: When your membership ends, your properties will not be listed
-                      </p>
-                    </div>
-                  )}
+                <CardContent>
+                  <p className="text-muted-foreground mb-4">
+                    Choose from Silver, Gold, or Platinum tiers when listing a property. Each tier offers different features and duration.
+                  </p>
+                  <Button onClick={() => window.location.href = '/add-property'}>
+                    Add New Property
+                  </Button>
                 </CardContent>
               </Card>
             </div>

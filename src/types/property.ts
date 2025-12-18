@@ -2,7 +2,7 @@ export type PropertyStatus = "for_sale" | "for_rent";
 export type PropertyType = "land" | "furnished_apartment" | "apartment" | "house" | "boarding_house";
 export type Currency = "ZMW" | "USD" | "GBP";
 export type PricePeriod = "per_month" | "per_week" | "per_day";
-export type PremiumTier = "silver" | "gold" | "platinum";
+export type ListingTier = "silver" | "gold" | "platinum";
 
 export interface Property {
   id: string;
@@ -21,9 +21,10 @@ export interface Property {
   ownerId: string;
   ownerName: string;
   ownerPhone?: string;
-  ownerIsPremium?: boolean;
-  ownerPremiumExpiry?: Date;
-  ownerPremiumTier?: PremiumTier;
+  // Per-listing payment fields
+  listingTier: ListingTier;
+  listingExpiryDate: Date;
+  listingPaidAt?: Date;
   isVisible?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -34,8 +35,5 @@ export interface User {
   email: string;
   displayName: string;
   photoURL?: string;
-  isPremium: boolean;
-  premiumTier?: PremiumTier;
-  premiumExpiryDate?: Date;
   createdAt: Date;
 }

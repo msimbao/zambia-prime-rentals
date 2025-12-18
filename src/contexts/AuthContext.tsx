@@ -1,17 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth, firestore, checkPremiumStatus } from "@/lib/firebase";
+import { auth, firestore } from "@/lib/firebase";
 import { User } from "@/types/property";
 
 interface AuthContextType {
   currentUser: any;
   userData: User | null;
-  isPremium: boolean;
-  premiumTier: string | undefined;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => Promise<void>;
-  refreshPremiumStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,16 +24,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userData, setUserData] = useState<User | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
-  const [premiumTier, setPremiumTier] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
-
-  const refreshPremiumStatus = async () => {
-    if (currentUser) {
-      const premium = await checkPremiumStatus(currentUser.uid);
-      setIsPremium(premium);
-    }
-  };
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user: any) => {
@@ -51,20 +39,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: user.email,
             displayName: data.displayName,
             photoURL: data.photoURL,
-            isPremium: data.isPremium || false,
-            premiumTier: data.premiumTier,
-            premiumExpiryDate: data.premiumExpiryDate?.toDate(),
             createdAt: data.createdAt?.toDate(),
           } as User);
-          
-          const premium = await checkPremiumStatus(user.uid);
-          setIsPremium(premium);
-          setPremiumTier(data.premiumTier);
         }
       } else {
         setUserData(null);
-        setIsPremium(false);
-        setPremiumTier(undefined);
       }
       
       setLoading(false);
@@ -80,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await firestore().collection('users').doc(result.user.uid).set({
         email,
         displayName,
-        isPremium: false,
         createdAt: new Date(),
       });
     }
@@ -97,13 +75,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     currentUser,
     userData,
-    isPremium,
-    premiumTier,
     loading,
     login,
     signup,
     logout,
-    refreshPremiumStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
