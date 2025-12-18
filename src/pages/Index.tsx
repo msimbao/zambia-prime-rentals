@@ -58,8 +58,10 @@ const Index = () => {
              data.ownerPremiumExpiry && 
              data.ownerPremiumExpiry.toDate() > now);
 
-          console.log(data.ownerIsPremium)
-          if (isPremiumActive) {
+          // Check if property is visible (default to true for backwards compatibility)
+          const isVisible = data.isVisible !== false;
+
+          if (isPremiumActive && isVisible) {
             propertyList.push({
               id: doc.id,
               ...data,

@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { Upload, X, Video, AlertCircle } from "lucide-react";
+import { Upload, X, Video, AlertCircle, Eye, EyeOff } from "lucide-react";
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
 
 const AddProperty = () => {
   const { currentUser, userData, isPremium, premiumTier } = useAuth();
@@ -48,7 +49,8 @@ const AddProperty = () => {
     sizeUnit: "m2",
     description: "",
     ownerPhone: "",
-    ownerName: ""
+    ownerName: "",
+    isVisible: true
   });
 
   useEffect(() => {
@@ -75,6 +77,7 @@ const AddProperty = () => {
           description: data.description,
           ownerPhone: data.ownerPhone || "",
           ownerName: data.ownerName || "",
+          isVisible: data.isVisible !== false, // default to true for backwards compatibility
         });
         setExistingImages(data.images || []);
         setExistingVideos(data.videos || []);
@@ -231,6 +234,7 @@ const AddProperty = () => {
         ownerIsPremium: isPremium,
         ownerPremiumTier: premiumTier,
         ownerPremiumExpiry: userData?.premiumExpiryDate || null,
+        isVisible: formData.isVisible,
         updatedAt: new Date(),
       };
 
@@ -449,6 +453,32 @@ const AddProperty = () => {
                   required
                 />
               </div>
+
+              {/* Visibility Toggle - Only show when editing */}
+              {editId && (
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+                  <div className="space-y-1">
+                    <Label htmlFor="visibility" className="text-base font-medium flex items-center gap-2">
+                      {formData.isVisible ? (
+                        <Eye className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-destructive" />
+                      )}
+                      Property Visibility
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {formData.isVisible 
+                        ? "This property is visible in public listings" 
+                        : "This property is hidden from public listings"}
+                    </p>
+                  </div>
+                  <Switch
+                    id="visibility"
+                    checked={formData.isVisible}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isVisible: checked })}
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Images (Max {tierLimits.maxImages})</Label>
