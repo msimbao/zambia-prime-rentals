@@ -40,9 +40,11 @@ const PropertyDetail = () => {
               setOwner({
                 id: ownerDoc.id,
                 email: ownerData.email,
+                displayEmail: ownerData.displayEmail,
                 displayName: ownerData.displayName,
                 photoURL: ownerData.photoURL,
                 phone: ownerData.phone,
+                phone2: ownerData.phone2,
                 whatsapp: ownerData.whatsapp,
                 aboutMe: ownerData.aboutMe,
                 createdAt: ownerData.createdAt?.toDate(),
@@ -321,6 +323,21 @@ const PropertyDetail = () => {
                       </div>
                     )}
 
+                    {/* Phone 2 */}
+                    {owner?.phone2 && (
+                      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-lg">
+                          <Phone className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Phone 2</p>
+                          <a href={`tel:${owner.phone2}`} className="font-semibold text-primary hover:underline">
+                            {owner.phone2}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
                     {/* WhatsApp */}
                     {owner?.whatsapp && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
@@ -334,16 +351,16 @@ const PropertyDetail = () => {
                       </div>
                     )}
 
-                    {/* Email */}
-                    {owner?.email && (
+                    {/* Email - show displayEmail if available, otherwise show signup email */}
+                    {(owner?.displayEmail || owner?.email) && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
                         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
                           <Mail className="h-5 w-5 text-white" />
                         </div>
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Email</p>
-                          <a href={`mailto:${owner.email}`} className="font-semibold text-primary hover:underline text-sm">
-                            {owner.email}
+                          <a href={`mailto:${owner.displayEmail || owner.email}`} className="font-semibold text-primary hover:underline text-sm">
+                            {owner.displayEmail || owner.email}
                           </a>
                         </div>
                       </div>
