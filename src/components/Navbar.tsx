@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sheet";
 
 const Navbar = () => {
-  const { currentUser, userData, isPremium, logout } = useAuth();
+  const { currentUser, userData, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const MenuContent = () => (
@@ -68,7 +68,7 @@ const Navbar = () => {
         <span>About Us</span>
       </Link>
 
-      {currentUser && isPremium && (
+      {currentUser && (
         <Link 
           to="/add-property"
           className="flex items-center space-x-2 hover:text-primary transition-colors"
@@ -138,12 +138,6 @@ const Navbar = () => {
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium">{userData?.displayName}</p>
                       <p className="text-xs text-muted-foreground">{userData?.email}</p>
-                      {isPremium && (
-                        <div className="flex items-center text-xs text-primary">
-                          <Crown className="h-3 w-3 mr-1" />
-                          Premium Member
-                        </div>
-                      )}
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

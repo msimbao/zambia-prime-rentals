@@ -53,21 +53,20 @@ const Index = () => {
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
           
-          const isPremiumActive = data.ownerIsPremium === undefined || 
-            (data.ownerIsPremium && 
-             data.ownerPremiumExpiry && 
-             data.ownerPremiumExpiry.toDate() > now);
+          // Check if listing is still active (not expired)
+          const isListingActive = data.listingExpiryDate && 
+            data.listingExpiryDate.toDate() > now;
 
           // Check if property is visible (default to true for backwards compatibility)
           const isVisible = data.isVisible !== false;
 
-          if (isPremiumActive && isVisible) {
+          if (isListingActive && isVisible) {
             propertyList.push({
               id: doc.id,
               ...data,
               createdAt: data.createdAt?.toDate(),
               updatedAt: data.updatedAt?.toDate(),
-              ownerPremiumExpiry: data.ownerPremiumExpiry?.toDate(),
+              listingExpiryDate: data.listingExpiryDate?.toDate(),
             } as Property);
           }
         });
