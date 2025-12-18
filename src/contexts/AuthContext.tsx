@@ -39,6 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: user.email,
             displayName: data.displayName,
             photoURL: data.photoURL,
+            phone: data.phone,
+            whatsapp: data.whatsapp,
+            aboutMe: data.aboutMe,
             createdAt: data.createdAt?.toDate(),
           } as User);
         }

@@ -283,6 +283,7 @@ const AddProperty = () => {
 
   const TierCard = ({ tier, config }: { tier: ListingTier; config: typeof PREMIUM_TIERS[ListingTier] }) => {
     const isSelected = selectedTier === tier;
+    const isPreviousTier = existingTier === tier;
     const colors = {
       silver: 'border-gray-400',
       gold: 'border-yellow-500',
@@ -291,10 +292,15 @@ const AddProperty = () => {
     
     return (
       <Card 
-        className={`cursor-pointer transition-all ${isSelected ? `ring-2 ring-primary ${colors[tier]}` : 'hover:shadow-lg'}`}
+        className={`cursor-pointer transition-all relative ${isSelected ? `ring-2 ring-primary ${colors[tier]}` : 'hover:shadow-lg'}`}
         onClick={() => handleSelectTierAndContinue(tier)}
       >
-        <CardHeader>
+        {isPreviousTier && editId && (
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full font-medium">
+            Previous Tier
+          </div>
+        )}
+        <CardHeader className={isPreviousTier && editId ? "pt-6" : ""}>
           <CardTitle className="flex items-center justify-between">
             <span className="capitalize">{config.name}</span>
             {tier === 'platinum' && <Crown className="h-5 w-5 text-blue-500" />}
@@ -656,8 +662,13 @@ const AddProperty = () => {
         {step === 'tier' && (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">Select Listing Tier</h2>
-              <p className="text-muted-foreground">Choose your tier first - this determines how many images and videos you can upload</p>
+              <h2 className="text-3xl font-bold mb-2">{editId ? "Renew Listing Tier" : "Select Listing Tier"}</h2>
+              <p className="text-muted-foreground">
+                {editId 
+                  ? "Select a tier to renew your listing. Your previous tier is highlighted."
+                  : "Choose your tier first - this determines how many images and videos you can upload"
+                }
+              </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

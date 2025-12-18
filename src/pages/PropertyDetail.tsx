@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { firestore } from "@/lib/firebase";
-import { Property } from "@/types/property";
+import { Property, User } from "@/types/property";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Maximize2, Phone, User, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MapPin, Maximize2, Phone, User as UserIcon, Mail, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 const PropertyDetail = () => {
   const { id } = useParams();
   const [property, setProperty] = useState<Property | null>(null);
+  const [owner, setOwner] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,12 +24,31 @@ const PropertyDetail = () => {
         const doc = await firestore().collection("properties").doc(id).get();
         if (doc.exists) {
           const data = doc.data();
-          setProperty({
+          const propertyData = {
             id: doc.id,
             ...data,
             createdAt: data.createdAt?.toDate(),
             updatedAt: data.updatedAt?.toDate(),
-          } as Property);
+          } as Property;
+          setProperty(propertyData);
+
+          // Fetch owner data
+          if (data.ownerId) {
+            const ownerDoc = await firestore().collection("users").doc(data.ownerId).get();
+            if (ownerDoc.exists) {
+              const ownerData = ownerDoc.data();
+              setOwner({
+                id: ownerDoc.id,
+                email: ownerData.email,
+                displayName: ownerData.displayName,
+                photoURL: ownerData.photoURL,
+                phone: ownerData.phone,
+                whatsapp: ownerData.whatsapp,
+                aboutMe: ownerData.aboutMe,
+                createdAt: ownerData.createdAt?.toDate(),
+              } as User);
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching property:", error);
@@ -95,12 +116,28 @@ const PropertyDetail = () => {
       .join(" ");
   };
 
+  const handleWhatsAppClick = () => {
+    const phone = owner?.whatsapp || owner?.phone;
+    if (phone) {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const message = encodeURIComponent(`Hi, I'm interested in the property: ${property.name} at ${property.location}`);
+      window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+    }
+  };
+
+  const handleCallClick = () => {
+    const phone = owner?.phone || owner?.whatsapp;
+    if (phone) {
+      window.location.href = `tel:${phone}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navbar />
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-6xl mx-auto">
-          {/* Enhanced Carousel with Always-Visible Controls */}
+          {/* Enhanced Carousel */}
           <div className="relative mb-8 group">
             <Carousel className="w-full">
               <CarouselContent>
@@ -117,7 +154,6 @@ const PropertyDetail = () => {
                 ))}
               </CarouselContent>
               
-              {/* Custom Always-Visible Navigation Buttons */}
               <CarouselPrevious className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white shadow-lg border-0 w-12 h-12 md:w-14 md:h-14 backdrop-blur-sm opacity-100">
                 <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
               </CarouselPrevious>
@@ -126,7 +162,6 @@ const PropertyDetail = () => {
               </CarouselNext>
             </Carousel>
             
-            {/* Image Counter */}
             <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
               {property.images.length} Photos {property.videos && property.videos.length > 0 && `• ${property.videos.length} Videos`}
             </div>
@@ -177,14 +212,14 @@ const PropertyDetail = () => {
                       </div>
                     </div>
                     <div className="text-left md:text-right">
-                     <div className="flex items-baseline mb-3">
-  <p className="text-2xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
-    {formatPrice(property.price, property.currency)}
-  </p>
-  {property.status === "for_rent" && (
-    <span className="text-sm text-gray-500 ml-1 font-medium">/{formatType(property.pricePeriod || "month")}</span>
-  )}
-</div>
+                      <div className="flex items-baseline mb-3">
+                        <p className="text-2xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
+                          {formatPrice(property.price, property.currency)}
+                        </p>
+                        {property.status === "for_rent" && (
+                          <span className="text-sm text-gray-500 ml-1 font-medium">/{formatType(property.pricePeriod || "month")}</span>
+                        )}
+                      </div>
                       <div className="flex gap-2">
                         <Badge 
                           variant={property.status === "for_sale" ? "default" : "secondary"}
@@ -248,116 +283,96 @@ const PropertyDetail = () => {
             <div>
               <Card className="sticky top-4 border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50">
                 <CardContent className="p-6 md:p-8 space-y-6">
+                  {/* Owner Profile Section */}
                   <div className="text-center pb-4 border-b-2 border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Get In Touch!</h2>
-                    <p className="text-gray-600">Call us on Whatsapp or Directly to Schedule a Viewing</p>
+                    <Avatar className="h-20 w-20 mx-auto mb-3">
+                      <AvatarImage src={owner?.photoURL} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                        {owner?.displayName?.charAt(0) || property.ownerName?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">
+                      {owner?.displayName || property.ownerName || "Property Owner"}
+                    </h2>
+                    <p className="text-gray-600 text-sm">Property Listed by</p>
                   </div>
-                  
-                  <div className="space-y-4">
-                    {/* <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
-                      <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
-                        <User className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600 mb-1">Owner</p>
-                        <p className="font-semibold text-gray-900 text-lg">{property.ownerName}</p>
-                      </div>
-                    </div> */}
 
-                    
-                    {/* {property.ownerPhone && (
+                  {/* About Me */}
+                  {owner?.aboutMe && (
+                    <div className="bg-gray-50 p-4 rounded-xl">
+                      <p className="text-sm text-gray-600 mb-1">About</p>
+                      <p className="text-gray-800 text-sm">{owner.aboutMe}</p>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-3">
+                    {/* Phone */}
+                    {owner?.phone && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
                         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-lg">
-                          <Phone className="h-6 w-6 text-white" />
+                          <Phone className="h-5 w-5 text-white" />
                         </div>
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Phone</p>
-                          <a 
-                            href={`tel:${property.ownerPhone}`}
-                            className="font-semibold text-primary hover:text-primary/80 transition-colors text-lg"
-                          >
-                            {property.ownerPhone}
+                          <a href={`tel:${owner.phone}`} className="font-semibold text-primary hover:underline">
+                            {owner.phone}
                           </a>
                         </div>
                       </div>
-                    )} */}
+                    )}
 
+                    {/* WhatsApp */}
+                    {owner?.whatsapp && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
-                        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-lg">
-                          <Phone className="h-6 w-6 text-white" />
+                        <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
+                          <MessageCircle className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">WhatsApp Line</p>
-                          <a  >
-                            +260 971897512
-                        
-                          </a>
+                          <p className="text-sm text-gray-600 mb-1">WhatsApp</p>
+                          <span className="font-semibold text-gray-900">{owner.whatsapp}</span>
                         </div>
                       </div>
+                    )}
 
-
-                      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
-                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-lg">
-                          <Phone className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Mobile Line 1</p>
-                          <a  >
-                            
-                            +260 750105948
-                          </a>
-                        </div>
-                      </div>
-
-
-                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
-                        <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 p-3 rounded-xl shadow-lg">
-                          <Phone className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Mobile Line 2</p>
-                          <a  >
-                            
-                            +260 961507104
-                          </a>
-                        </div>
-                      </div>
-
-
+                    {/* Email */}
+                    {owner?.email && (
                       <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
                         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
-                          <Mail className="h-6 w-6 text-white" />
+                          <Mail className="h-5 w-5 text-white" />
                         </div>
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Email</p>
-                          <a  className="text-sm">
-                            crystalflamerealestate@gmail.com
-                        
+                          <a href={`mailto:${owner.email}`} className="font-semibold text-primary hover:underline text-sm">
+                            {owner.email}
                           </a>
                         </div>
                       </div>
-
-                  
-
+                    )}
                   </div>
                   
+                  {/* Action Buttons */}
                   <div className="space-y-3 pt-4">
-                    {/* <Button 
-                      className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                      size="lg"
-                      onClick={() => window.location.href = `tel:+260971897512`}
-                    >
-                      <Phone className="mr-2 h-5 w-5" />
-                      Call Now
-                    </Button> */}
-                    {/* <Button 
-                      variant="outline"
-                      className="w-full h-14 text-lg font-semibold border-2 hover:bg-gray-50"
-                      size="lg"
-                    >
-                      <Mail className="mr-2 h-5 w-5" />
-                      Send Message
-                    </Button> */}
+                    {(owner?.whatsapp || owner?.phone) && (
+                      <Button 
+                        className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700"
+                        size="lg"
+                        onClick={handleWhatsAppClick}
+                      >
+                        <MessageCircle className="mr-2 h-5 w-5" />
+                        WhatsApp
+                      </Button>
+                    )}
+                    {owner?.phone && (
+                      <Button 
+                        variant="outline"
+                        className="w-full h-14 text-lg font-semibold border-2 hover:bg-gray-50"
+                        size="lg"
+                        onClick={handleCallClick}
+                      >
+                        <Phone className="mr-2 h-5 w-5" />
+                        Call Now
+                      </Button>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t-2 border-gray-100">
