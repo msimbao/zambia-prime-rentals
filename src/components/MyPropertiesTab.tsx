@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Pencil, Trash2, MapPin, Home } from "lucide-react";
+import { Pencil, Trash2, MapPin, Home, Eye, EyeOff } from "lucide-react";
 
 const MyPropertiesTab = () => {
   const { currentUser } = useAuth();
@@ -152,12 +152,23 @@ const MyPropertiesTab = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 mb-3">
+                  <div className="flex gap-2 mb-3 flex-wrap">
                     <Badge variant="secondary">{getStatusBadge(property.status)}</Badge>
                     <Badge variant="outline">{getTypeBadge(property.type)}</Badge>
                     <Badge variant="outline">
                       {property.size} {property.sizeUnit}
                     </Badge>
+                    {property.isVisible === false ? (
+                      <Badge variant="destructive" className="flex items-center gap-1">
+                        <EyeOff className="h-3 w-3" />
+                        Hidden
+                      </Badge>
+                    ) : (
+                      <Badge variant="default" className="flex items-center gap-1 bg-green-600">
+                        <Eye className="h-3 w-3" />
+                        Visible
+                      </Badge>
+                    )}
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-3">

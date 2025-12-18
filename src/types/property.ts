@@ -24,6 +24,7 @@ export interface Property {
   ownerIsPremium?: boolean;
   ownerPremiumExpiry?: Date;
   ownerPremiumTier?: PremiumTier;
+  isVisible?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
