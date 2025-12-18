@@ -35,5 +35,8 @@ export interface User {
   email: string;
   displayName: string;
   photoURL?: string;
+  phone?: string;
+  whatsapp?: string;
+  aboutMe?: string;
   createdAt: Date;
 }
