@@ -31,7 +31,7 @@ const AddProperty = () => {
   const [videos, setVideos] = useState<File[]>([]);
   const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
   const [existingVideos, setExistingVideos] = useState<string[]>([]);
-  const [step, setStep] = useState<'details' | 'tier' | 'payment'>('details');
+  const [step, setStep] = useState<'tier' | 'details' | 'payment'>('tier');
   const [selectedTier, setSelectedTier] = useState<ListingTier>('silver');
   const [existingTier, setExistingTier] = useState<ListingTier | null>(null);
 
@@ -194,29 +194,17 @@ const AddProperty = () => {
     return true;
   };
 
-  const handleContinueToTier = () => {
+  const handleContinueToPayment = () => {
     if (validateDetailsStep()) {
-      setStep('tier');
+      setStep('payment');
     }
   };
 
-  const handleSelectTier = (tier: ListingTier) => {
-    const totalImages = existingImages.length + images.length;
-    const totalVideos = existingVideos.length + videos.length;
-    const tierConfig = PREMIUM_TIERS[tier];
-
-    if (totalImages > tierConfig.maxImages) {
-      toast.error(`${tierConfig.name} tier only allows ${tierConfig.maxImages} images. Please remove some images or choose a higher tier.`);
-      return;
-    }
-    if (totalVideos > tierConfig.maxVideos) {
-      toast.error(`${tierConfig.name} tier only allows ${tierConfig.maxVideos} videos. Please remove some videos or choose a higher tier.`);
-      return;
-    }
-
+  const handleSelectTierAndContinue = (tier: ListingTier) => {
     setSelectedTier(tier);
-    setStep('payment');
+    setStep('details');
   };
+
 
   const saveProperty = async () => {
     setIsLoading(true);
@@ -304,7 +292,7 @@ const AddProperty = () => {
     return (
       <Card 
         className={`cursor-pointer transition-all ${isSelected ? `ring-2 ring-primary ${colors[tier]}` : 'hover:shadow-lg'}`}
-        onClick={() => handleSelectTier(tier)}
+        onClick={() => handleSelectTierAndContinue(tier)}
       >
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -347,14 +335,14 @@ const AddProperty = () => {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Step Indicator */}
         <div className="flex items-center justify-center mb-8">
-          <div className={`flex items-center ${step === 'details' ? 'text-primary' : 'text-muted-foreground'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'details' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
-            <span className="ml-2 font-medium">Details</span>
+          <div className={`flex items-center ${step === 'tier' ? 'text-primary' : 'text-muted-foreground'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'tier' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
+            <span className="ml-2 font-medium">Select Tier</span>
           </div>
           <div className="w-16 h-0.5 bg-muted mx-2"></div>
-          <div className={`flex items-center ${step === 'tier' ? 'text-primary' : 'text-muted-foreground'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'tier' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
-            <span className="ml-2 font-medium">Select Tier</span>
+          <div className={`flex items-center ${step === 'details' ? 'text-primary' : 'text-muted-foreground'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'details' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
+            <span className="ml-2 font-medium">Details</span>
           </div>
           <div className="w-16 h-0.5 bg-muted mx-2"></div>
           <div className={`flex items-center ${step === 'payment' ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -363,7 +351,7 @@ const AddProperty = () => {
           </div>
         </div>
 
-        {/* Step 1: Property Details */}
+        {/* Step 2: Property Details */}
         {step === 'details' && (
           <Card>
             <CardHeader>
@@ -371,7 +359,7 @@ const AddProperty = () => {
                 {editId ? "Edit Property" : "Add New Property"}
               </CardTitle>
               <CardDescription>
-                Fill in the property details below
+                Fill in the property details below. Your <span className="font-semibold capitalize">{selectedTier}</span> tier allows up to {tierLimits.maxImages} images and {tierLimits.maxVideos} videos.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -651,20 +639,25 @@ const AddProperty = () => {
                   </div>
                 </div>
 
-                <Button type="button" onClick={handleContinueToTier} className="w-full" size="lg">
-                  Continue to Select Tier
-                </Button>
+                <div className="flex gap-4">
+                  <Button type="button" variant="outline" onClick={() => setStep('tier')} className="flex-1" size="lg">
+                    Back to Tier Selection
+                  </Button>
+                  <Button type="button" onClick={handleContinueToPayment} className="flex-1" size="lg">
+                    Continue to Payment
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
         )}
 
-        {/* Step 2: Tier Selection */}
+        {/* Step 1: Tier Selection */}
         {step === 'tier' && (
           <div className="space-y-6">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-2">Select Listing Tier</h2>
-              <p className="text-muted-foreground">Choose how you want your property to be listed</p>
+              <p className="text-muted-foreground">Choose your tier first - this determines how many images and videos you can upload</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -672,10 +665,6 @@ const AddProperty = () => {
                 <TierCard key={tier} tier={tier as ListingTier} config={config} />
               ))}
             </div>
-
-            <Button variant="outline" onClick={() => setStep('details')} className="mt-4">
-              Back to Details
-            </Button>
           </div>
         )}
 
@@ -736,8 +725,8 @@ const AddProperty = () => {
                 </Button>
                 {/* ========== END DEVELOPER ONLY ========== */}
 
-                <Button variant="ghost" onClick={() => setStep('tier')}>
-                  Back to Tier Selection
+                <Button variant="ghost" onClick={() => setStep('details')}>
+                  Back to Details
                 </Button>
               </div>
             </CardContent>
