@@ -22,7 +22,9 @@ const Profile = () => {
   
   const [profileData, setProfileData] = useState({
     displayName: "",
+    displayEmail: "",
     phone: "",
+    phone2: "",
     whatsapp: "",
     aboutMe: "",
   });
@@ -32,7 +34,9 @@ const Profile = () => {
       setPreviewUrl(userData.photoURL || "");
       setProfileData({
         displayName: userData.displayName || "",
+        displayEmail: userData.displayEmail || "",
         phone: userData.phone || "",
+        phone2: userData.phone2 || "",
         whatsapp: userData.whatsapp || "",
         aboutMe: userData.aboutMe || "",
       });
@@ -75,7 +79,9 @@ const Profile = () => {
     try {
       await firestore().collection("users").doc(currentUser.uid).update({
         displayName: profileData.displayName,
+        displayEmail: profileData.displayEmail,
         phone: profileData.phone,
+        phone2: profileData.phone2,
         whatsapp: profileData.whatsapp,
         aboutMe: profileData.aboutMe,
       });
@@ -161,9 +167,20 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Sign-up Email</Label>
                     <Input value={userData?.email || ""} disabled className="bg-muted" />
-                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                    <p className="text-xs text-muted-foreground">This is your login email and cannot be changed</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="displayEmail">Display Email</Label>
+                    <Input
+                      id="displayEmail"
+                      value={profileData.displayEmail}
+                      onChange={(e) => setProfileData({ ...profileData, displayEmail: e.target.value })}
+                      placeholder="email@example.com"
+                    />
+                    <p className="text-xs text-muted-foreground">This email will be shown on your property listings instead of your sign-up email</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,14 +195,24 @@ const Profile = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                      <Label htmlFor="phone2">Phone Number 2</Label>
                       <Input
-                        id="whatsapp"
-                        value={profileData.whatsapp}
-                        onChange={(e) => setProfileData({ ...profileData, whatsapp: e.target.value })}
+                        id="phone2"
+                        value={profileData.phone2}
+                        onChange={(e) => setProfileData({ ...profileData, phone2: e.target.value })}
                         placeholder="+260 xxx xxx xxx"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                    <Input
+                      id="whatsapp"
+                      value={profileData.whatsapp}
+                      onChange={(e) => setProfileData({ ...profileData, whatsapp: e.target.value })}
+                      placeholder="+260 xxx xxx xxx"
+                    />
                   </div>
 
                   <div className="space-y-2">

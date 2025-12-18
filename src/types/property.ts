@@ -33,9 +33,11 @@ export interface Property {
 export interface User {
   id: string;
   email: string;
+  displayEmail?: string;
   displayName: string;
   photoURL?: string;
   phone?: string;
+  phone2?: string;
   whatsapp?: string;
   aboutMe?: string;
   createdAt: Date;

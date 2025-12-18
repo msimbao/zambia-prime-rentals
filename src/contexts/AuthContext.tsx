@@ -37,9 +37,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserData({
             id: user.uid,
             email: user.email,
+            displayEmail: data.displayEmail,
             displayName: data.displayName,
             photoURL: data.photoURL,
             phone: data.phone,
+            phone2: data.phone2,
             whatsapp: data.whatsapp,
             aboutMe: data.aboutMe,
             createdAt: data.createdAt?.toDate(),
