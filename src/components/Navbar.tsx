@@ -19,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import logo from "@/assets/logo.png";
 
 const Navbar = () => {
   const { currentUser, userData, logout } = useAuth();
@@ -97,12 +98,20 @@ const Navbar = () => {
   return (
     <nav className="border-b bg-card sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
+        {/* <Link to="/" className="flex items-center space-x-2">
           <Gem className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Crystal Flame
           </span>
-        </Link>
+        </Link> */}
+
+<Link to="/" className="flex items-center space-x-2">
+  <img src={logo} alt="Crystal Flame Logo" className="h-8 w-8" />
+  <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+    Crystal Flame
+  </span>
+</Link>
+
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
