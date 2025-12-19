@@ -714,7 +714,7 @@ const AddProperty = () => {
 
               <div className="flex flex-col gap-4">
                 <LencoPaymentButton
-                  publicKey="pk_live_3ca99b10-4e01-11ef-803e-8f5c7f6d94a0"
+                  publicKey="pub-cc9bf023e28953d13294230f6cc32c3a02ce0ab32fae80bf"
                   reference={`listing-${selectedTier}-${currentUser?.uid}-${Date.now()}`}
                   email={currentUser?.email || 'user@example.com'}
                   amount={PREMIUM_TIERS[selectedTier].price}
