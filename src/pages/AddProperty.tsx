@@ -727,13 +727,13 @@ const AddProperty = () => {
                 
                 {/* Developer free listing button */}
                 {/* ========== DEVELOPER ONLY - COMMENT OUT BEFORE GOING LIVE ========== */}
-                <Button 
+                {/* <Button 
                   variant="outline" 
                   onClick={saveProperty}
                   disabled={isLoading}
                 >
                   🔐 Dev: Skip Payment & List Property
-                </Button>
+                </Button> */}
                 {/* ========== END DEVELOPER ONLY ========== */}
 
                 <Button variant="ghost" onClick={() => setStep('details')}>
