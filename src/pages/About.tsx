@@ -170,10 +170,10 @@ const About = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900">WhatsApp Us</h3>
                 <a 
-                  href="tel:+260123456789" 
+                  href="tel:+260961507104" 
                   className="text-primary hover:text-primary/80 transition-colors text-lg font-medium"
                 >
-                  +260 971897512
+                  +260 961507104 
                 </a>
               </CardContent>
             </Card>
@@ -184,9 +184,15 @@ const About = () => {
                   <Phone className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900">Call Us</h3>
-                <p className="text-gray-600 text-lg">
-                  +260 750105948
-                </p>
+                {/* <p className="text-gray-600 text-lg">
+                  +260 971897512
+                </p> */}
+                    <a 
+                  href="tel:+260971897512" 
+                  className="text-primary hover:text-primary/80 transition-colors text-lg font-medium"
+                >
+                  +260 971897512
+                </a>
               </CardContent>
             </Card>
           </div>
